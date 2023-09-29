@@ -28,7 +28,7 @@ void setup() {
   };
 
   minim = new Minim(this);
-  player = minim.loadFile("music1.mov"); // Sound input
+  player = minim.loadFile("music2.mp3"); // Sound input
   player.play();
   
   fft = new FFT(player.bufferSize(), player.sampleRate());
