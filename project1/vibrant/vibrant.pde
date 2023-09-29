@@ -7,7 +7,7 @@ void setup() {
   background(0, 255);
   change = 0;
   colorPalette = new color[]{
-    color(124, 167, 238, 30),
+    color(176,242,143,30),
     color(73, 127, 250, 30),
     color(198, 215, 250, 30),
     color(143, 44, 191, 30),
