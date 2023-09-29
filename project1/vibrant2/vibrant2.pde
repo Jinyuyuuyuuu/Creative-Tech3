@@ -1,3 +1,5 @@
+import com.hamoid.*;
+
 import ddf.minim.*;
 import ddf.minim.analysis.*;
 import ddf.minim.effects.*;
@@ -39,7 +41,7 @@ void setup() {
   for (int i = 0; i < 110; i++) {
     organics.add(new Organic(0.1 + i, width / 2, height / 2, i * 1, i * random(90), colorPalette[(int) random(8)]));
   }
-}
+  }
 
 void draw() {
   background(43, 44, 52);
