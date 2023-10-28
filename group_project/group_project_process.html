@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+        <title>Project 2-GroupProject Process</title>
+         <meta charset="utf-8">
+          <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <h1 class="text-block" align="center">Project2_GroupProject ProcessBook</h1>
+&nbsp; &nbsp;&nbsp;
+
+
+<iframe src="https://player.vimeo.com/video/878148501?h=a2e6184392" width="1152" height="648" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+
+   <h3>Final-Output</h3>
+
+  &nbsp;&nbsp;  
+
+
+</div>
+
+<div class="two-columns-grid">
+    <div class="paragraph">
+    <h2>Project Brief</h2>
+    <div>  Our project is inspired by “The Myth of Sisyphus”. The original story is about Sisyphus, a figure from Greek mythology condemned by the gods to roll a boulder up a hill for eternity, only to have it roll back down each time. Camus argues in the theory that life is inherently absurd because humans seek meaning and purpose in a world that lacks inherent meaning. Despite this, he suggests that we should embrace the absurdity of existence and choose to live with passion and revolt against the futility of life. The act of continuing to push the boulder up the hill, even knowing it will roll back down, becomes a symbol of the human spirit and our ability to find meaning through the struggle itself.
+</div></div>
+    <div><img src="https://render.fineartamerica.com/images/rendered/default/print/8/7/break/images/artworkimages/medium/2/sisyphus-jeffrey-hummel.jpg"></div>
+</div>
+&nbsp;&nbsp;&nbsp;&nbsp;
+    <h3>Diagram 1</h3>
+        <img src="Frame 1.png">
+
+<div class="two-columns-grid">
+    <div class="paragraph">
+    <h2>Questions Response</h2>
+    <div>  In our project, three creatures live in the same environment and play different roles. They interact with each other, obtaining data from one another to facilitate cooperation. Adafruit serves as a mediator, much like a translator, converting their three distinct languages into content that everyone can read. Each of our three components functions as a data collector. As for each individual's specific role, Pengfan’s part consists of a sound generator and a brightness sensor, Cai’s part includes a mechanical movement generator and a sound collector, and my part involves a visual generator and a distance detector.
+
+</div></div>
+    <div><img src="Frame 2.png"></div>
+</div>
+
+    <img src="Diagram.png"></div>
+
+<div class="two-columns-grid">
+    <div class="paragraph">
+    <h2>My Section_Input</h2>
+    <div> I use an Esp32 board to connect a Distance Sensor for detecting changes in the distance of the items controlled by Cai in the rotating disk. After that, upload the data into a Adafruit feed for Pengfan to read.
+
+</div></div>
+    <div>
+         <img src="sensor.jpg" width="500px" ></div>
+
+    </div>
+</div>
+ <pre>
+      <code>
+#include "config.h"
+
+const int trigPin = 13;
+const int echoPin = 12;
+// defines variables
+long duration;
+int distance;
+
+AdafruitIO_Feed *analog = io.feed("tech3-group-project");
+AdafruitIO_Feed *microphonevalue = io.feed("microphonevalue", "Baka");
+
+void setup() {
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); 
+  Serial.begin(115200);
+
+  while(!Serial);
+  
+  Serial.print("Connecting to Adafruit IO");
+  io.connect();
+
+  microphonevalue->onMessage(handleMessage);
+
+  while(io.status()<AIO_CONNECTED){
+    Serial.print(".");
+    delay(500);
+    }
+
+  Serial.println();
+  Serial.println(io.statusText());
+  microphonevalue->get();
+}
+
+void loop() {
+  io.run();
+ 
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  distance = duration * 0.034 / 2;
+
+  //Serial.print("Sending this: ");
+  //Serial.println(distance);
+  analog->save(distance);
+
+  delay(2000);
+}
+
+void handleMessage(AdafruitIO_Data *data){
+  //Serial.print("received <-");
+  Serial.println(data->value());
+}
+
+#include "config.h"
+
+const int trigPin = 13;
+const int echoPin = 12;
+// defines variables
+long duration;
+int distance;
+
+AdafruitIO_Feed *analog = io.feed("tech3-group-project");
+AdafruitIO_Feed *microphonevalue = io.feed("microphonevalue", "Baka");
+
+void setup() {
+  pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
+  pinMode(echoPin, INPUT); 
+  Serial.begin(115200);
+
+  while(!Serial);
+  
+  Serial.print("Connecting to Adafruit IO");
+  io.connect();
+
+  microphonevalue->onMessage(handleMessage);
+
+  while(io.status()<AIO_CONNECTED){
+    Serial.print(".");
+    delay(500);
+    }
+
+  Serial.println();
+  Serial.println(io.statusText());
+  microphonevalue->get();
+}
+
+void loop() {
+  io.run();
+ 
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  // Calculating the distance
+  distance = duration * 0.034 / 2;
+
+  //Serial.print("Sending this: ");
+  //Serial.println(distance);
+  analog->save(distance);
+
+  delay(2000);
+}
+
+void handleMessage(AdafruitIO_Data *data){
+  //Serial.print("received <-");
+  Serial.println(data->value());
+}
+
+</code>
+</pre>
+
+<div class="two-columns-grid">
+    <div class="paragraph">
+<h2>My Section_Output</h2>
+    <div> By using Arduino, I retrieve the sound data uploaded by Cai into Adafruit and transfer it to Touchdesigner. I then use this data to control the visual wave patterns. The visual expression is a lined mountain shape. It is akin to Sisyphus’s hill and mirrors the various stages of our lives, constantly experiencing ups and downs. As the sound volume increases, the amplitude also grows. I achieve a more dynamic appearance of the oscillations by varying the depth of colors.
+
+</div></div>
+    <div>
+        
+    </div>
+</div>
+
+<img src="TouchdesignerProcess.png" width="1482px"></div>
