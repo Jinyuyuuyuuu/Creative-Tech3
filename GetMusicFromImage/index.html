@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dynamic Image Search</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="text" id="searchQuery" placeholder="Enter search term, e.g., puppy" />
+<button role="button" id="searchTrigger">Search!</button>
+<section id="imageResults" style="text-align: left;"></section> <!-- Ensure alignment is left -->
+
+<script>
+    const searchTrigger = document.getElementById('searchTrigger');
+    const searchQuery = document.getElementById('searchQuery');
+    const imageResults = document.getElementById('imageResults');
+    const apiKey = "42046065-e2d158f6c3dad3c7fd7a52e59"; // Use your own API key here
+
+    let getPixabayImage = () => {
+        let query = searchQuery.value.trim();
+        if (query.length === 0) {
+            alert("Please enter a search term.");
+            return;
+        }
+        let url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&pretty=true`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => appendImageData(data))
+            .catch(error => console.error("Fetch error: ", error));
+    };
+
+    let appendImageData = (data) => {
+        imageResults.innerHTML = ''; // Clear previous results
+        if (data.hits.length > 0) {
+            let hit = data.hits[0]; // Taking only the first result
+            let imgElem = document.createElement('img');
+            imgElem.src = hit.webformatURL; // Use webformatURL for a bigger image
+            imgElem.alt = hit.tags;
+            imgElem.style.maxWidth = "100%"; // Ensure it's responsive but can go larger
+            imgElem.style.height = "auto"; // Maintain aspect ratio
+            imgElem.style.display = "block"; // Ensure it displays correctly
+            imgElem.style.marginLeft = "0"; // Align to the left
+            imageResults.appendChild(imgElem);
+        } else {
+            imageResults.innerHTML = '<p>No results found. Try a different search term.</p>';
+        }
+    };
+
+    searchTrigger.addEventListener("click", getPixabayImage);
+</script>
+</body>
+</html>
