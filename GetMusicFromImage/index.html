@@ -1,54 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dynamic Image Search</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image and Music Mapping Example</title>
 </head>
 <body>
+    <input type="text" id="searchQuery" placeholder="Enter search term, e.g., beach">
+    <button id="searchTrigger">Search</button>
+    <div id="imageResults"></div>
+    <div id="musicData"></div>
 
-<input type="text" id="searchQuery" placeholder="Enter search term, e.g., puppy" />
-<button role="button" id="searchTrigger">Search!</button>
-<section id="imageResults" style="text-align: left;"></section> <!-- Ensure alignment is left -->
+    <script>
+        const moodMapping = {
+            beach: ["Relaxed", "Carefree"],
+            sunset: ["Romantic", "Melancholic"],
+            dog: ["Joyful", "Energetic"],
+            city: ["Energetic", "Hustle"],
+            nature: ["Peaceful", "Soothing"],
+            flower: ["Happy", "Bright"],
+            snow: ["Calm", "Reflective"]
+        };
 
-<script>
-    const searchTrigger = document.getElementById('searchTrigger');
-    const searchQuery = document.getElementById('searchQuery');
-    const imageResults = document.getElementById('imageResults');
-    const apiKey = "42046065-e2d158f6c3dad3c7fd7a52e59"; // Use your own API key here
+        const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59'; // Replace with your actual Pixabay API key
+        const searchTrigger = document.getElementById('searchTrigger');
+        const searchQuery = document.getElementById('searchQuery');
 
-    let getPixabayImage = () => {
-        let query = searchQuery.value.trim();
-        if (query.length === 0) {
-            alert("Please enter a search term.");
-            return;
+        searchTrigger.addEventListener('click', function() {
+            const searchTerm = searchQuery.value.trim();
+            if (!searchTerm) {
+                alert("Please enter a search term.");
+                return;
+            }
+            fetchPixabayImage(searchTerm);
+        });
+
+        function fetchPixabayImage(searchTerm) {
+            const url = `https://pixabay.com/api/?key=${pixabayAPIKey}&q=${encodeURIComponent(searchTerm)}&image_type=photo`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.hits && data.hits.length > 0) {
+                        const firstImage = data.hits[0];
+                        displayImage(firstImage);
+                        findMusicByMood(firstImage.tags);
+                    } else {
+                        console.log('No images found.');
+                    }
+                })
+                .catch(error => console.error('Error fetching image:', error));
         }
-        let url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&pretty=true`;
-        
-        fetch(url)
-            .then(response => response.json())
-            .then(data => appendImageData(data))
-            .catch(error => console.error("Fetch error: ", error));
-    };
 
-    let appendImageData = (data) => {
-        imageResults.innerHTML = ''; // Clear previous results
-        if (data.hits.length > 0) {
-            let hit = data.hits[0]; // Taking only the first result
-            let imgElem = document.createElement('img');
-            imgElem.src = hit.webformatURL; // Use webformatURL for a bigger image
-            imgElem.alt = hit.tags;
-            imgElem.style.maxWidth = "100%"; // Ensure it's responsive but can go larger
-            imgElem.style.height = "auto"; // Maintain aspect ratio
-            imgElem.style.display = "block"; // Ensure it displays correctly
-            imgElem.style.marginLeft = "0"; // Align to the left
-            imageResults.appendChild(imgElem);
-        } else {
-            imageResults.innerHTML = '<p>No results found. Try a different search term.</p>';
+        function displayImage(imageData) {
+            const imageSection = document.getElementById('imageResults');
+            imageSection.innerHTML = `<img src="${imageData.webformatURL}" alt="Image related to ${imageData.tags}" style="max-width: 100%; height: auto; display: block;">`;
         }
-    };
 
-    searchTrigger.addEventListener("click", getPixabayImage);
-</script>
+        function findMusicByMood(tags) {
+            console.log("Received tags:", tags);
+            const moods = [];
+            const tagList = tags.split(', ').map(tag => tag.trim().toLowerCase());
+
+            tagList.forEach(tag => {
+                if (moodMapping[tag]) {
+                    moods.push(...moodMapping[tag]);
+                }
+            });
+
+            if (moods.length > 0) {
+                displayMoodMatches(moods);
+            } else {
+                console.log('No matching moods found for the tags.');
+                document.getElementById('musicData').innerHTML = '<p>No matching moods found for the image tags.</p>';
+            }
+        }
+
+        function displayMoodMatches(moods) {
+            const musicDataSection = document.getElementById('musicData');
+            musicDataSection.innerHTML = `<p>Matched Music Moods: ${moods.join(', ')}</p>`;
+            // Additional functionality to fetch music data based on moods could be implemented here
+        }
+    </script>
 </body>
 </html>
