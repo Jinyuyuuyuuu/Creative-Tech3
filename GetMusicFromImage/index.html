@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image and Music Mapping Example</title>
+    <style>
+        #imageResults img, #musicData img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        #musicData {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <input type="text" id="searchQuery" placeholder="Enter search term, e.g., beach">
@@ -13,21 +23,28 @@
 
     <script>
         const moodMapping = {
-            beach: ["Relaxed", "Carefree"],
-            sunset: ["Romantic", "Melancholic"],
-            dog: ["Joyful", "Energetic"],
-            city: ["Energetic", "Hustle"],
-            nature: ["Peaceful", "Soothing"],
-            flower: ["Happy", "Bright"],
-            snow: ["Calm", "Reflective"]
+            beach: "Relaxed",
+            sunset: "Romantic",
+            dog: "Joyful",
+            city: "Energetic",
+            nature: "Peaceful",
+            flower: "Happy",
+            snow: "Calm"
         };
 
-        const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59'; // Replace with your actual Pixabay API key
-        const searchTrigger = document.getElementById('searchTrigger');
-        const searchQuery = document.getElementById('searchQuery');
+        const moodToArtistMapping = {
+            Relaxed: "Jack Johnson",
+            Romantic: "Ed Sheeran",
+            Joyful: "Pharrell Williams",
+            Energetic: "Calvin Harris",
+            Peaceful: "Norah Jones",
+            Happy: "Katy Perry",
+            Calm: "Adele"
+        };
 
-        searchTrigger.addEventListener('click', function() {
-            const searchTerm = searchQuery.value.trim();
+        const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59';
+        document.getElementById('searchTrigger').addEventListener('click', function() {
+            const searchTerm = document.getElementById('searchQuery').value.trim();
             if (!searchTerm) {
                 alert("Please enter a search term.");
                 return;
@@ -40,45 +57,41 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.hits && data.hits.length > 0) {
-                        const firstImage = data.hits[0];
-                        displayImage(firstImage);
-                        findMusicByMood(firstImage.tags);
-                    } else {
-                        console.log('No images found.');
-                    }
+                    displayImage(data.hits[0] || null);
                 })
                 .catch(error => console.error('Error fetching image:', error));
         }
 
         function displayImage(imageData) {
             const imageSection = document.getElementById('imageResults');
-            imageSection.innerHTML = `<img src="${imageData.webformatURL}" alt="Image related to ${imageData.tags}" style="max-width: 100%; height: auto; display: block;">`;
+            imageSection.innerHTML = imageData ? `<img src="${imageData.webformatURL}" alt="${imageData.tags}">` : '<p>No results found. Try a different search term.</p>';
+            if (imageData) findMusicByMood(imageData.tags.split(', '));
         }
 
         function findMusicByMood(tags) {
-            console.log("Received tags:", tags);
-            const moods = [];
-            const tagList = tags.split(', ').map(tag => tag.trim().toLowerCase());
-
-            tagList.forEach(tag => {
-                if (moodMapping[tag]) {
-                    moods.push(...moodMapping[tag]);
-                }
-            });
-
-            if (moods.length > 0) {
-                displayMoodMatches(moods);
-            } else {
-                console.log('No matching moods found for the tags.');
-                document.getElementById('musicData').innerHTML = '<p>No matching moods found for the image tags.</p>';
-            }
+            const artist = tags.map(tag => moodMapping[tag.toLowerCase()]).map(mood => moodToArtistMapping[mood]).find(artist => artist);
+            if (artist) fetchAlbumCover(artist);
+            else document.getElementById('musicData').innerHTML = '<p>No matching mood found for the image tags.</p>';
         }
 
-        function displayMoodMatches(moods) {
+        function fetchAlbumCover(artistName) {
+            const apiKey = '2'; // Placeholder API key
+            const url = `https://www.theaudiodb.com/api/v1/json/${apiKey}/searchalbum.php?s=${encodeURIComponent(artistName)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    displayAlbumCover(data.album ? data.album[0] : null);
+                })
+                .catch(error => console.error('Error fetching album data:', error));
+        }
+
+        function displayAlbumCover(album) {
             const musicDataSection = document.getElementById('musicData');
-            musicDataSection.innerHTML = `<p>Matched Music Moods: ${moods.join(', ')}</p>`;
-            // Additional functionality to fetch music data based on moods could be implemented here
+            musicDataSection.innerHTML = album ? `
+                <h3>${album.strAlbum}</h3>
+                <img src="${album.strAlbumThumb}" alt="Cover of ${album.strAlbum}">
+                <p>By ${album.strArtist}</p>` : '<p>No albums found for the artist.</p>';
         }
     </script>
 </body>
