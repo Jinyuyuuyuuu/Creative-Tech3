@@ -22,25 +22,41 @@
     <div id="musicData"></div>
 
     <script>
-        const moodMapping = {
-            beach: "Relaxed",
-            sunset: "Romantic",
-            dog: "Joyful",
-            city: "Energetic",
-            nature: "Peaceful",
-            flower: "Happy",
-            snow: "Calm"
-        };
+       const moodMapping = {
+    beach: "Relaxed",
+    sunset: "Romantic",
+    puppy: "Joyful",
+    city: "Energetic",
+    nature: "Peaceful",
+    flower: "Happy",
+    snow: "Calm",
+    mountain: "Inspiring",
+    rain: "Melancholic",
+    night: "Mysterious",
+    party: "Upbeat",
+    forest: "Serene",
+    desert: "Lonely",
+    ocean: "Infinite",
+    adventure: "Excited"
+};
 
-        const moodToArtistMapping = {
-            Relaxed: "Jack Johnson",
-            Romantic: "Ed Sheeran",
-            Joyful: "Pharrell Williams",
-            Energetic: "Calvin Harris",
-            Peaceful: "Norah Jones",
-            Happy: "Katy Perry",
-            Calm: "Adele"
-        };
+const moodToArtistMapping = {
+    Relaxed: "Jack Johnson",
+    Romantic: "Ed Sheeran",
+    Joyful: "coldplay",
+    Energetic: "Calvin Harris",
+    Peaceful: "Norah Jones",
+    Happy: "Katy Perry",
+    Calm: "Adele",
+    Inspiring: "Hans Zimmer",
+    Melancholic: "Billie Eilish",
+    Mysterious: "Massive Attack",
+    Upbeat: "Bruno Mars",
+    Serene: "Enya",
+    Lonely: "Bon Iver",
+    Infinite: "Sigur Rós",
+    Excited: "Imagine Dragons"
+};
 
         const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59';
         document.getElementById('searchTrigger').addEventListener('click', function() {
@@ -53,45 +69,69 @@
         });
 
         function fetchPixabayImage(searchTerm) {
-            const url = `https://pixabay.com/api/?key=${pixabayAPIKey}&q=${encodeURIComponent(searchTerm)}&image_type=photo`;
+            const url = `https://pixabay.com/api/?key=42046065-e2d158f6c3dad3c7fd7a52e59&q=${encodeURIComponent(searchTerm)}&image_type=photo`;
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    displayImage(data.hits[0] || null);
+                    if (data.hits.length > 0) displayImage(data.hits[0]);
+                    else noResultsFound();
                 })
                 .catch(error => console.error('Error fetching image:', error));
         }
 
         function displayImage(imageData) {
             const imageSection = document.getElementById('imageResults');
-            imageSection.innerHTML = imageData ? `<img src="${imageData.webformatURL}" alt="${imageData.tags}">` : '<p>No results found. Try a different search term.</p>';
-            if (imageData) findMusicByMood(imageData.tags.split(', '));
+            imageSection.innerHTML = `<img src="${imageData.webformatURL}" alt="Related to ${imageData.tags}">`;
+            findMusicByMood(imageData.tags.split(', '));
+        }
+
+        function noResultsFound() {
+            document.getElementById('imageResults').innerHTML = '<p>No results found. Try a different search term.</p>';
+            document.getElementById('musicData').innerHTML = '';
         }
 
         function findMusicByMood(tags) {
-            const artist = tags.map(tag => moodMapping[tag.toLowerCase()]).map(mood => moodToArtistMapping[mood]).find(artist => artist);
-            if (artist) fetchAlbumCover(artist);
+            const foundArtist = tags
+                .map(tag => moodMapping[tag.toLowerCase()])
+                .find(mood => moodToArtistMapping[mood]);
+
+            if (foundArtist) fetchAlbumCover(foundArtist);
             else document.getElementById('musicData').innerHTML = '<p>No matching mood found for the image tags.</p>';
         }
 
         function fetchAlbumCover(artistName) {
-            const apiKey = '2'; // Placeholder API key
-            const url = `https://www.theaudiodb.com/api/v1/json/${apiKey}/searchalbum.php?s=${encodeURIComponent(artistName)}`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    displayAlbumCover(data.album ? data.album[0] : null);
-                })
-                .catch(error => console.error('Error fetching album data:', error));
-        }
+    const url = `https://www.theaudiodb.com/api/v1/json/2/searchalbum.php?s=${encodeURIComponent(artistName)}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("API response:", data)
+            if (data && data.album && data.album.length > 0) {
+                const albumCoverUrl = data.album[0].strAlbumThumb;
+                console.log("Album cover URL:", albumCoverUrl); // Log the URL to check its presence and validity
+                if (albumCoverUrl) {
+                    displayAlbumCover(albumCoverUrl, data.album[0].strAlbum);
+                } else {
+                    console.log("Album cover not available.");
+                }
+            } else {
+                console.log("No albums found for the artist.");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching album data:", error);
+        });
+}
 
         function displayAlbumCover(album) {
             const musicDataSection = document.getElementById('musicData');
-            musicDataSection.innerHTML = album ? `
+            musicDataSection.innerHTML = `
                 <h3>${album.strAlbum}</h3>
-                <img src="${album.strAlbumThumb}" alt="Cover of ${album.strAlbum}">
-                <p>By ${album.strArtist}</p>` : '<p>No albums found for the artist.</p>';
+                <img src="${album.strAlbumThumb}" alt="Cover of ${album.strAlbum}" />
+                <p>By ${album.strArtist}</p>`;
+        }
+
+        function noAlbumFound(artistName) {
+            document.getElementById('musicData').innerHTML = `<p>No albums found for ${artistName}.</p>`;
         }
     </script>
 </body>

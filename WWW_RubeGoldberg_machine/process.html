@@ -9,3 +9,85 @@
 
   <h1 class="text-block" align="center">WWW as a Rube Goldberg machine ProcessBook</h1>
     <img src="diagram2.png"></div>
+     <img src="diagram-reviced.png"></div>
+
+
+
+  <h1 class="text-block" align="center">Final Outcome</h1>
+    <a href="https:/">Image-Album-Collection</a>
+
+  <h1>First Successful Code</h1>
+
+ <pre>
+   <code>
+            const moodMapping = {
+            beach: ["Relaxed", "Carefree"],
+            sunset: ["Romantic", "Melancholic"],
+            dog: ["Joyful", "Energetic"],
+            city: ["Energetic", "Hustle"],
+            nature: ["Peaceful", "Soothing"],
+            flower: ["Happy", "Bright"],
+            snow: ["Calm", "Reflective"]
+        };
+
+        const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59'; // Replace with your actual Pixabay API key
+        const searchTrigger = document.getElementById('searchTrigger');
+        const searchQuery = document.getElementById('searchQuery');
+
+        searchTrigger.addEventListener('click', function() {
+            const searchTerm = searchQuery.value.trim();
+            if (!searchTerm) {
+                alert("Please enter a search term.");
+                return;
+            }
+            fetchPixabayImage(searchTerm);
+        });
+
+        function fetchPixabayImage(searchTerm) {
+            const url = `https://pixabay.com/api/?key=${pixabayAPIKey}&q=${encodeURIComponent(searchTerm)}&image_type=photo`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.hits && data.hits.length > 0) {
+                        const firstImage = data.hits[0];
+                        displayImage(firstImage);
+                        findMusicByMood(firstImage.tags);
+                    } else {
+                        console.log('No images found.');
+                    }
+                })
+                .catch(error => console.error('Error fetching image:', error));
+        }
+
+        function displayImage(imageData) {
+            const imageSection = document.getElementById('imageResults');
+            imageSection.innerHTML = ...
+        }
+
+        function findMusicByMood(tags) {
+            console.log("Received tags:", tags);
+            const moods = [];
+            const tagList = tags.split(', ').map(tag => tag.trim().toLowerCase());
+
+            tagList.forEach(tag => {
+                if (moodMapping[tag]) {
+                    moods.push(...moodMapping[tag]);
+                }
+            });
+
+            if (moods.length > 0) {
+                displayMoodMatches(moods);
+            } else {
+                console.log('No matching moods found for the tags.');
+                document.getElementById('musicData').innerHTML = '<p>No matching moods found for the image tags.</p>';
+            }
+        }
+
+        function displayMoodMatches(moods) {
+            const musicDataSection = document.getElementById('musicData');
+            musicDataSection.innerHTML = `<p>Matched Moods: ${moods.join(', ')}</p>`;
+            // Additional functionality to fetch music data based on moods could be implemented here
+        }
+
+   </code>
+</pre>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="css/style.css"/>
+    <title>Get objects</title>
+
+</head>
+<body>
+    <input type="text" id="searchQuery" placeholder="Enter search term, e.g., beach">
+    <button id="searchTrigger">Search</button>
+    <div id="imageResults"></div>
+    <div id="musicData"></div>
+
+<script>
+    const moodMapping = {
+    beach: "Relaxed",
+    sunset: "Romantic",
+    puppy: "Joyful",
+    city: "Energetic",
+    nature: "Peaceful",
+    flower: "Happy",
+    snow: "Calm",
+    mountain: "Inspiring",
+    rain: "Melancholic",
+    night: "Mysterious",
+    party: "Upbeat",
+    forest: "Serene",
+    desert: "Lonely",
+    ocean: "Infinite",
+    adventure: "Excited"
+};
+
+const moodToArtistMapping = {
+    Relaxed: "Jack Johnson",
+    Romantic: "Ed Sheeran",
+    Joyful: "coldplay",
+    Energetic: "Calvin Harris",
+    Peaceful: "Norah Jones",
+    Happy: "Katy Perry",
+    Calm: "Adele",
+    Inspiring: "Hans Zimmer",
+    Melancholic: "Billie Eilish",
+    Mysterious: "Massive Attack",
+    Upbeat: "Bruno Mars",
+    Serene: "Enya",
+    Lonely: "Bon Iver",
+    Infinite: "Sigur Rós",
+    Excited: "Imagine Dragons"
+};
+
+    const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59';
+
+   document.getElementById('searchTrigger').addEventListener('click', function() {
+        const searchTerm = document.getElementById('searchQuery').value.trim();
+        if (!searchTerm) {
+            alert("Please enter a search term.");
+            return;
+        }
+        fetchPixabayImage(searchTerm);
+    });
+
+    function fetchPixabayImage(searchTerm) {
+        const url = `https://pixabay.com/api/?key=${pixabayAPIKey}&q=${encodeURIComponent(searchTerm)}&image_type=photo`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.hits.length > 0) displayImage(data.hits[0]);
+                else noResultsFound();
+            })
+            .catch(error => console.error('Error fetching image:', error));
+    }
+
+    function displayImage(imageData) {
+        const imageSection = document.getElementById('imageResults');
+        imageSection.innerHTML = `<img src="${imageData.webformatURL}" alt="Related to ${imageData.tags}">`;
+        const tags = imageData.tags.split(', ');
+        findMusicByMood(tags); // Use tags to determine the mood and artist
+    }
+
+    function noResultsFound() {
+        document.getElementById('imageResults').innerHTML = '<p>No results found. Try a different search term.</p>';
+        document.getElementById('musicData').innerHTML = '';
+    }
+
+    function findMusicByMood(tags) {
+        // Attempt to find an artist based on the first relevant mood in the tags
+        const artistName = tags.map(tag => moodMapping[tag])
+                               .find(mood => moodToArtistMapping[mood] !== undefined);
+        if (artistName) {
+            const artist = moodToArtistMapping[artistName];
+            fetchArtistDiscography(artist); // Fetch the discography for the determined artist
+        } else {
+            document.getElementById('musicData').innerHTML = '<p>No matching artist found for the image tags.</p>';
+        }
+    }
+
+    function fetchArtistDiscography(artistName) {
+        const url = `https://www.theaudiodb.com/api/v1/json/2/discography.php?s=${encodeURIComponent(artistName)}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.album) {
+                    displayDiscography(data.album, artistName);
+                } else {
+                    noAlbumFound(artistName);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching discography:", error);
+            });
+    }
+
+     function displayDiscography(albums, artistName) {
+        const musicDataSection = document.getElementById('musicData');
+        let content = `<h3>Discography of ${artistName}</h3><ul>`;
+        let lastAlbumYear = null; // Initialize variable to hold the year of the last album
+    albums.forEach(album => {
+        content += `<li>${album.strAlbum} - ${album.intYearReleased}</li>`;
+        lastAlbumYear = album.intYearReleased; // Update with the year of the current album in the loop
+    });
+    content += `</ul>`;
+    musicDataSection.innerHTML = content;
+    
+    if (lastAlbumYear) {
+        fetchMetMuseumObjectsByYear(lastAlbumYear); // Fetch Met Museum objects for the year of the last album
+     }
+    }
+
+    function fetchMetMuseumObjectsByYear(year) {
+        const url = `https://collectionapi.metmuseum.org/public/collection/v1/objects?dateBegin=${year}&dateEnd=${year}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.total > 0) {
+                    displayMetObjects(data.objectIDs, year);
+                } else {
+                    console.log("No objects found for the year " + year);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching Met Museum objects:", error);
+            });
+    }
+
+      function displayMetObjects(objectIDs, year) {
+        const objectsSection = document.getElementById('musicData'); // Ensure this is the correct section or create a new one
+        objectsSection.innerHTML += `<h3>Met Museum Objects from ${year}</h3>`;
+        objectIDs.slice(0, 3).forEach(objectID => { // Limit to first 5 objects for simplicity
+            fetchObjectDetails(objectID); // Fetch details for each object
+        });
+    }
+
+    function fetchObjectDetails(objectID) {
+        const url = `https://collectionapi.metmuseum.org/public/collection/v1/objects/${objectID}`;
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                displayObjectDetails(data); // Display details of each object
+            })
+            .catch(error => {
+                console.error("Error fetching object details:", error);
+            });
+    }
+
+    function displayObjectDetails(object) {
+        const objectsSection = document.getElementById('musicData'); // Ensure this is the correct section or create a new one
+        let content = `<div>
+            <h4>${object.title}</h4>
+            <p>Artist: ${object.artistDisplayName}</p>
+            <p>Date: ${object.objectDate}</p>
+            <p>medium: ${object.medium}</p>
+            </div>`;
+        objectsSection.innerHTML += content;
+    }
+
+</script>
+</body>
+</html>
