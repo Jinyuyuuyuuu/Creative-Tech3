@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+        <title class="center">Chat Bot process book</title>
+         <meta charset="utf-8">
+          <link rel="stylesheet" href="css/process.css"/>
+          <link rel="stylesheet" href="css/prism.css">
+
+  </head>
+  <script src="prism.js"></script>
+  <h1 class="text-block" align="center">Chat Bot Process Book</h1>
+
+<div class="two-columns-grid">
+   <div class="paragraph">
+    <h2>Step 1 – Set Up</h2>
+    <div> 
+    My first step was to obtain photos from Pixabay by searching for keywords, in order to integrate a search functionality using the Pixabay API, I transformed the button into a search trigger. To call the Pixabay API, I followed these steps: <br>
+
+    1. Sign up for an account on the Pixabay website to get the API key.<br>
+    2. Make the API request using JavaScript's fetch.<br>
+    3. The key hits in the response object is an array of images. Each item in this array is an object containing details about an image, such as its URL (webformatURL), tags, the user who uploaded the image, etc.<br>
+    4. I chose to fetch the image URL and display the first image.
+
+</div></div>
+    <pre>
+     <code class="language-python">
+    import os
+	import discord
+	from discord.ui import View
+
+	intents = discord.Intents.default()
+	intents.message_content = True
+
+	client = discord.Client(intents=intents)
+
+	class MyCustomView(View):
+	def **init**(self):
+	super().**init**()
+
+	@discord.ui.button(label="Click me!")
+	async def button_callback(self, interaction, button):
+
+	await interaction.response.send_message("Happy Birthday, Leo🎂🎉💗")
+
+	@discord.ui.button(label="Make a Wish!")
+	async def button_callback2(self, interaction, button):
+
+	await interaction.response.send_message("You will be Healthy, Smart, Handsome, and Lucky as always!")
+
+	@client.event
+	async def on_ready():
+	print("Bot is ready!")
+
+	@client.event
+	async def on_message(message):
+	if message.author == client.user:
+	return
+
+	if client.user in message.mentions:
+	ourview = MyCustomView()
+	await message.channel.send("Thanks for mentioning me!", view=ourview)
+
+	if message.content.startswith("Hi Friend"):
+	ourview = MyCustomView()
+	await message.channel.send("Hi Leo⛷️", view=ourview)
+
+	my_secret = os.environ['DISCORD_BOT_SECRET']
+	client.run(my_secret)
+      </code>
+       </pre>
+</div>
+
+<div class="two-columns-grid">
+   <div class="paragraph">
+    <h2>Step 2 –  Embed emoji in a button & delay the button response</h2>
+    <div> 
+    After 
+
+</div></div>
+    <pre>
+     <code class="language-python">
+    @discord.ui.button(label="", style=discord.ButtonStyle.secondary, emoji='🦥')
+	async def buttonCallback5(self, interaction, button):
+	await interaction.response.defer()  
+	# Acknowledge the interaction first to prevent a timeout
+	await asyncio.sleep(20)
+	await interaction.followup.send("I am Flash")  
+	# Send the message after the delay
+      </code>
+       </pre>
+</div>
