@@ -21,7 +21,13 @@
   <div class="two-columns-grid">
     <div class="paragraph">
     <h2>Step 1 – Search Image</h2>
-    <div>  In our project, three creatures live in the same environment and play different roles. They interact with each other, obtaining data from one another to facilitate cooperation. Adafruit serves as a mediator, much like a translator, converting their three distinct languages into content that everyone can read. Each of our three components functions as a data collector. As for each individual's specific role, Pengfan’s part consists of a sound generator and a brightness sensor, Cai’s part includes a mechanical movement generator and a sound collector, and my part involves a visual generator and a distance detector.
+    <div> 
+    My first step was to obtain photos from Pixabay by searching for keywords, in order to integrate a search functionality using the Pixabay API, I transformed the button into a search trigger. To call the Pixabay API, I followed these steps: <br>
+
+    1. Sign up for an account on the Pixabay website to get the API key.<br>
+    2. Make the API request using JavaScript's fetch.<br>
+    3. The key hits in the response object is an array of images. Each item in this array is an object containing details about an image, such as its URL (webformatURL), tags, the user who uploaded the image, etc.<br>
+    4. I chose to fetch the image URL and display the first image.
 
 </div></div>
     <div align="left"> 
@@ -133,82 +139,232 @@
 </div>
 </div>
      <div class="text-block links" >First Successful Attempt:
-    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/WWW_RubeGoldberg_machine/ImgAlbumLyrics.html" class="links">Fetch Color From Image</a>
+    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/GetColorFromImg/index.html" class="links">Fetch Color From Image</a>
      </div>
 
-  
-  <h2>First Successful Code</h2>
+ <div class="two-columns-grid">
+    <div class="paragraph">
+    <h2>Step 3 – Fetch Album by the Image Mood</h2>
+    <div> Next, I tried to generate corresponding Album Covers by passing the mood of the picture to The AudioDB API. However, the problem with this attempt is that Pixabay does not have a direct display function for mood, and although The AudioDB marks the mood of each piece of music, it does not allow searching by mood. Therefore, I decided to obtain the tags of pictures from Pixabay and map them to moods, and then proceed to match these moods with various artists for transmission.
 
- <pre>
-   <code>
-            const moodMapping = {
-            beach: ["Relaxed", "Carefree"],
-            sunset: ["Romantic", "Melancholic"],
-            dog: ["Joyful", "Energetic"],
-            city: ["Energetic", "Hustle"],
-            nature: ["Peaceful", "Soothing"],
-            flower: ["Happy", "Bright"],
-            snow: ["Calm", "Reflective"]
+</div></div>
+    <div align="left"> 
+    	<pre>
+          <code>
+         const moodMapping = {
+           beach: "Relaxed",
+           sunset: "Romantic",
+           puppy: "Joyful",
+           city: "Energetic",
+           nature: "Peaceful",
+           flower: "Happy",
+           snow: "Calm",
+           mountain: "Inspiring",
+           rain: "Melancholic",
+           night: "Mysterious",
+           party: "Upbeat",
+           forest: "Serene",
+           desert: "Lonely",
+           ocean: "Infinite",
+           adventure: "Excited"
+         };
+
+        const moodToArtistMapping = {
+          Relaxed: "Jack Johnson",
+          Romantic: "Ed Sheeran",
+          Joyful: "coldplay",
+          Energetic: "Calvin Harris",
+          Peaceful: "Norah Jones",
+          Happy: "Katy Perry",
+          Calm: "Adele",
+          Inspiring: "Hans Zimmer",
+          Melancholic: "Billie Eilish",
+          Mysterious: "Massive Attack",
+          Upbeat: "Bruno Mars",
+          Serene: "Enya",
+          Lonely: "Bon Iver",
+          Infinite: "Sigur Rós",
+          Excited: "Imagine Dragons"
+         };
+      </code>
+       </pre>
+        
+   <pre>
+      <code>
+       function findMusicByMood(tags) {
+
+        const artistName = tags.map(tag => moodMapping[tag])
+            .find(mood => moodToArtistMapping[mood] !== undefined);
+
+        if (artistName) {
+            const artist = moodToArtistMapping[artistName];
+            fetchArtistDiscography(artist);
+
+        } else {
+            document.getElementById('musicData').innerHTML =
+             'No matching artist found for the image tags.';
+        }
+    }
+      </code>
+    </pre>
+   </div>
+   </div>
+
+  <div class="text-block links" >Second Attempt:
+    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/GetAlbumFromImage/index.html" class="links">Fetch Album by the Image Mood</a>
+     </div>
+
+   <div class="two-columns-grid">
+    <div align="left"> 
+    	<pre>
+          <code>
+      function fetchColorPalette(yearReleased) {
+
+        let lastDigit = yearReleased.toString().slice(-1);
+        let rValue = parseInt(lastDigit) * 28; 
+        let data = {
+            model: "default",
+            input: [[rValue, 43, 44], [90, 83, 82], "N", "N", "N"]
         };
 
-        const pixabayAPIKey = '42046065-e2d158f6c3dad3c7fd7a52e59'; // Replace with your actual Pixabay API key
-        const searchTrigger = document.getElementById('searchTrigger');
-        const searchQuery = document.getElementById('searchQuery');
-
-        searchTrigger.addEventListener('click', function() {
-            const searchTerm = searchQuery.value.trim();
-            if (!searchTerm) {
-                alert("Please enter a search term.");
-                return;
+        fetch("http://colormind.io/api/", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.result) {
+               document.body.style.backgroundColor = 
+               `rgb(${data.result[0].join(',')})`;
+                displayColorPalette(data.result);
             }
-            fetchPixabayImage(searchTerm);
-        });
+        })
+        .catch(error => console.error('Error fetching color palette:', error));
+    }
 
-        function fetchPixabayImage(searchTerm) {
-            const url = `https://pixabay.com/api/?key=${pixabayAPIKey}&q=${encodeURIComponent(searchTerm)}&image_type=photo`;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.hits && data.hits.length > 0) {
-                        const firstImage = data.hits[0];
-                        displayImage(firstImage);
-                        findMusicByMood(firstImage.tags);
-                    } else {
-                        console.log('No images found.');
-                    }
-                })
-                .catch(error => console.error('Error fetching image:', error));
-        }
+    function displayColorPalette(palette) {
+        const paletteContainer = document.getElementById('colorPalette');
+        paletteContainer.innerHTML = palette.map(color =>
+    }
+     </code>
+       </pre>
+   </div>
+   <div class="paragraph">
+    <h2>Step 4 – Fetch Color From Album</h2>
+    <div>  My wish was to pass the information obtained from the Album to the Colormind API and get a color palette. Unfortunately, even after using my own server and the method improved in class, this CORS issue still kept reoccurring. After many attempts, due to my unfamiliarity with the traditional method of XMLHttpRequest to make the API call, I had to give up and start looking for other available APIs.
+    
+    <br><br>
+    <img src="CORSissue.png"></div>
 
-        function displayImage(imageData) {
-            const imageSection = document.getElementById('imageResults');
-            imageSection.innerHTML = ...
-        }
+</div>
 
-        function findMusicByMood(tags) {
-            console.log("Received tags:", tags);
-            const moods = [];
-            const tagList = tags.split(', ').map(tag => tag.trim().toLowerCase());
+</div>
+</div>
 
-            tagList.forEach(tag => {
-                if (moodMapping[tag]) {
-                    moods.push(...moodMapping[tag]);
+<div class="two-columns-grid">
+    <div class="paragraph">
+    <h2>Step 5 – Fetch Object From Album</h2>
+    <div> After a series of attempts, I decided to obtain information about the collections received by The Met Museum in the same year as the latest Album year obtained. To avoid too much content, I chose to display only 3 items and limited the displayed information to include Object Name, Artist, Date, and Medium.
+
+</div></div>
+    <div align="left"> 
+    	<pre>
+          <code>
+       function fetchArtistDiscography(artistName) {
+        const url = `https://www.theaudiodb.com/api/v1/json/2/discography.php?s=
+        ${encodeURIComponent(artistName)}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.album) {
+                    displayDiscography(data.album, artistName);
+                } else {
+                    noAlbumFound(artistName);
                 }
+            })
+            .catch(error => {
+                console.error("Error fetching discography:", error);
             });
+    }
 
-            if (moods.length > 0) {
-                displayMoodMatches(moods);
-            } else {
-                console.log('No matching moods found for the tags.');
-                document.getElementById('musicData').innerHTML = '<p>No matching moods found for the image tags.</p>';
-            }
-        }
+      function displayDiscography(albums, artistName) {
+        const musicDataSection = document.getElementById('musicData');
+        let content = `Discography of ${artistName}`;
+        let lastAlbumYear = null; 
+    albums.forEach(album => {
+        content += `${album.strAlbum} - ${album.intYearReleased}`;
+        lastAlbumYear = album.intYearReleased; 
+    content += `</ul>`;
+    musicDataSection.innerHTML = content;
+    
+    if (lastAlbumYear) {
+        fetchMetMuseumObjectsByYear(lastAlbumYear); 
+        // Fetch Met Museum objects for the year of the last album
+     }
+    }
 
-        function displayMoodMatches(moods) {
-            const musicDataSection = document.getElementById('musicData');
-            musicDataSection.innerHTML = `<p>Matched Moods: ${moods.join(', ')}</p>`;
-            // Additional functionality to fetch music data based on moods could be implemented here
-        }
+    function fetchMetMuseumObjectsByYear(year) {
+        const url = `https://collectionapi.metmuseum.org/
+        public/collection/
+        v1/objects?dateBegin=${year}&dateEnd=${year}`;
+        fetch(url)
 
-   </code>
-</pre>
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.total > 0) {
+                    displayMetObjects(data.objectIDs, year);
+                } else {
+                    console.log("No objects found for the year " + year);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching Met Museum objects:", error);
+            });
+    }
+
+      function displayMetObjects(objectIDs, year) {
+        const objectsSection = document.getElementById('musicData'); 
+        objectsSection.innerHTML += `Met Museum Objects from ${year}`;
+        objectIDs.slice(0, 3).forEach(objectID => 
+        { // Limit to first 3 objects for simplicity
+            fetchObjectDetails(objectID); 
+        });
+    }
+
+    function fetchObjectDetails(objectID) {
+        const url = `https://collectionapi.metmuseum.org/
+        public/collection/v1/objects/${objectID}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                displayObjectDetails(data);
+            })
+            .catch(error => {
+                console.error("Error fetching object details:", error);
+            });
+    }
+
+    function displayObjectDetails(object) {
+        const objectsSection = 
+        document.getElementById('musicData'); 
+        let content = `${object.title}
+            Artist: ${object.artistDisplayName}
+            Date: ${object.objectDate}
+            medium: ${object.medium}`;
+        objectsSection.innerHTML += content;
+    }
+      </code>
+       </pre>
+   </div>
+</div>
+
+     <div class="text-block links" >The Nth attempt...
+    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/WWW_RubeGoldberg_machine/ImgAlbumLyrics.html" class="links">Fetch Object From Album</a>
+     </div>
+<br><br><br><br>
+
+</html>
+
