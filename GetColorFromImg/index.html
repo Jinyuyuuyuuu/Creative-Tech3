@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image and Color Palette Finder</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="text" id="searchQuery" placeholder="Enter search term, e.g., puppy" />
+<button role="button" id="searchTrigger">Search</button>
+<div id="resultContainer">
+    <section id="imageResults"></section>
+    <section id="colorPalette"></section>
+</div>
+
+<script>
+    const searchTrigger = document.getElementById('searchTrigger');
+    const searchQuery = document.getElementById('searchQuery');
+    const resultContainer = document.getElementById('resultContainer');
+    const imageResults = document.getElementById('imageResults');
+    const colorPalette = document.getElementById('colorPalette');
+    const apiKey = "42046065-e2d158f6c3dad3c7fd7a52e59"; // Use your own API key here
+
+    let getPixabayImage = () => {
+        let query = searchQuery.value.trim();
+        if (query.length === 0) {
+            alert("Please enter a search term.");
+            return;
+        }
+        let url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&pretty=true`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                appendImageData(data);
+                // Optionally trigger Colormind API call here if you need specific colors from the image
+                // For demonstration, we'll call it directly
+                getColorPalette();
+            })
+            .catch(error => console.error("Fetch error: ", error));
+    };
+
+    let appendImageData = (data) => {
+        imageResults.innerHTML = ''; // Clear previous results
+        if (data.hits.length > 0) {
+            let hit = data.hits[0]; // Taking only the first result
+            let imgElem = document.createElement('img');
+            imgElem.src = hit.webformatURL; // Using webformatURL for a better size
+            imgElem.alt = hit.tags;
+            imageResults.appendChild(imgElem);
+        } else {
+            imageResults.innerHTML = '<p>No results found. Try a different search term.</p>';
+        }
+    };
+
+    let getColorPalette = () => {
+        let url = "http://colormind.io/api/";
+        let data = {
+            model: "default",
+            input : [[44,43,44],[90,83,82],"N","N","N"]
+        };
+var http = new XMLHttpRequest();
+
+http.onreadystatechange = function() {
+    if(http.readyState == 4 && http.status == 200) {
+        var palette = JSON.parse(http.responseText).result;
+        console.log(palette[0][1])
+         document.body.style.backgroundColor = `rgb( ${palette[0][0]},${palette[0][1]}, ${palette[0][2]} )`; 
+    }
+}
+   // et url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=photo&pretty=true`;
+http.open("POST", url, true);
+http.send(JSON.stringify(data));
+
+
+        // fetch(url, {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify(data)
+        // })
+        // .then(response => response.json())
+        // .then(data => {
+        //     appendColorPalette(data.result); // Append the palette to the page
+        // })
+        // .catch(error => console.error("Error fetching color palette: ", error));
+    };
+
+    let appendColorPalette = (palette) => {
+        colorPalette.innerHTML = ''; // Clear previous palette
+        palette.forEach(color => {
+            let colorDiv = document.createElement('div');
+            colorDiv.className = 'colorSwatch';
+            colorDiv.style.backgroundColor = `rgb(${color.join(',')})`;
+            colorPalette.appendChild(colorDiv);
+        });
+    };
+
+    searchTrigger.addEventListener("click", getPixabayImage);
+</script>
+</body>
+</html>

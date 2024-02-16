@@ -72,12 +72,18 @@ const moodToArtistMapping = {
             .catch(error => console.error('Error fetching image:', error));
     }
 
-    function displayImage(imageData) {
-        const imageSection = document.getElementById('imageResults');
-        imageSection.innerHTML = `<img src="${imageData.webformatURL}" alt="Related to ${imageData.tags}">`;
-        const tags = imageData.tags.split(', ');
-        findMusicByMood(tags); // Use tags to determine the mood and artist
-    }
+   let appendImageData = (data) => {
+        imageResults.innerHTML = ''; // Clear previous results
+        if (data.hits.length > 0) {
+            let hit = data.hits[0]; // Taking only the first result
+            let imgElem = document.createElement('img');
+            imgElem.src = hit.webformatURL; // Using webformatURL for a better size
+            imgElem.alt = hit.tags;
+            imageResults.appendChild(imgElem);
+        } else {
+            imageResults.innerHTML = '<p>No results found. Try a different search term.</p>';
+        }
+    };
 
     function noResultsFound() {
         document.getElementById('imageResults').innerHTML = '<p>No results found. Try a different search term.</p>';

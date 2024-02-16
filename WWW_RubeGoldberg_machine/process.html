@@ -13,10 +13,131 @@
 
 
 
-  <h1 class="text-block" align="center">Final Outcome</h1>
-    <a href="https:/">Image-Album-Collection</a>
+  <div class="text-block links" >Final Outcome
+    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/WWW_RubeGoldberg_machine/ImgAlbumLyrics.html" class="links">Image-Album-Collection</a>
+</div>
 
-  <h1>First Successful Code</h1>
+
+  <div class="two-columns-grid">
+    <div class="paragraph">
+    <h2>Step 1 – Search Image</h2>
+    <div>  In our project, three creatures live in the same environment and play different roles. They interact with each other, obtaining data from one another to facilitate cooperation. Adafruit serves as a mediator, much like a translator, converting their three distinct languages into content that everyone can read. Each of our three components functions as a data collector. As for each individual's specific role, Pengfan’s part consists of a sound generator and a brightness sensor, Cai’s part includes a mechanical movement generator and a sound collector, and my part involves a visual generator and a distance detector.
+
+</div></div>
+    <div align="left"> 
+    	<pre>
+          <code>
+         searchTrigger.addEventListener('click', function() {
+            const searchTerm = searchQuery.value.trim();
+            if (!searchTerm) {
+                alert("Please enter a search term.");
+                return;
+            }
+            fetchPixabayImage(searchTerm);
+        });
+
+        function fetchPixabayImage(searchTerm) {
+            const url = `https://pixabay.com/
+            api/?key=${pixabayAPIKey}&q=
+            ${encodeURIComponent(searchTerm)}&image_type=photo`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.hits && data.hits.length > 0) {
+                        const firstImage = data.hits[0];
+                        displayImage(firstImage);
+                        findMusicByMood(firstImage.tags);
+                    } else {
+                        console.log('No images found.');
+                    }
+                })
+            .catch(error => console.error('Error fetching image:', error));
+           }
+
+        function displayImage(imageData) {
+            const imageSection = document.getElementById('imageResults');
+            imageSection.innerHTML = ...
+        }
+      </code>
+       </pre>
+   </div>
+</div>
+
+ <div class="two-columns-grid">
+    <div align="left"> 
+    	<pre>
+          <code>
+         let appendImageData = (data) => {
+        imageResults.innerHTML = ''; 
+
+        if (data.hits.length > 0) {
+            let hit = data.hits[0]; 
+            let imgElem = document.createElement('img');
+            imgElem.src = hit.webformatURL; 
+            imgElem.alt = hit.tags;
+            imageResults.appendChild(imgElem);
+
+        } else {
+            imageResults.innerHTML = 'No results found. 
+            Try a different search term.';
+        }
+    };
+      </code>
+       </pre>
+
+       <pre>
+          <code>
+        let getColorPalette = () => {
+        let url = "http://colormind.io/api/";
+        let data = {
+            model: "default",
+            input: ["N","N","N","N","N"] 
+        };
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            appendColorPalette(data.result); 
+        })
+        .catch(error => console.error("Error fetching color palette: ", error));
+    };
+
+    let appendColorPalette = (palette) => {
+        colorPalette.innerHTML = ''; // Clear previous palette
+        palette.forEach(color => {
+            let colorDiv = document.createElement('div');
+            colorDiv.className = 'colorSwatch';
+            colorDiv.style.backgroundColor = `rgb(${color.join(',')})`;
+            colorPalette.appendChild(colorDiv);
+        });
+    };
+     </code>
+       </pre>
+   </div>
+   <div class="paragraph">
+    <h2>Step 2 – Fetch Color From Image</h2>
+    <div>  Next, as shown in my first diagram, I want to extract a color from the image and generate a palette extended from this color through the Colormind API. Unfortunately, I just realized that the API I wanted to use, Colormind, supports neither HTTPS nor CORS, leading to a persistent issue of Cross-Origin Request Blocked.
+    
+    <br><br><br><br>
+    Step 2 Update: In class, we learned how to set up a local server to avoid issues caused by CORS, but I still encountered problems when I tried it myself. So, I asked for a solution during the class, and it turns out that the reason is Colormind uses the traditional method of XMLHttpRequest to make the API call, instead of the modern fetch API we learned.
+
+</div>
+
+</div>
+</div>
+     <div class="text-block links" >First Successful Attempt:
+    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/WWW_RubeGoldberg_machine/ImgAlbumLyrics.html" class="links">Fetch Color From Image</a>
+     </div>
+
+  
+  <h2>First Successful Code</h2>
 
  <pre>
    <code>
