@@ -37,7 +37,7 @@ img {
 }  
 .two-columns-grid{
 /*  margin-top: 100px;
-  margin-bottom: 100px;*/
+*/margin-bottom: -60px;
   padding: 100px;
   display: grid;
   grid-template-columns: 1fr 1fr;
