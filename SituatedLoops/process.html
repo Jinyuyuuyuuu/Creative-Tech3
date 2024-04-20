@@ -2,265 +2,52 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-        <title class="center">Creative technology as personal practice Process</title>
+        <title class="center">Simulated Loops Process</title>
          <meta charset="utf-8">
           <link rel="stylesheet" href="css/process.css"/>
   </head>
 
-  <h1 class="text-block" align="center">Creative technology as personal practice ProcessBook</h1>
-    <img src="diagram2.png"></div>
-     <img src="diagram-reviced.png"></div>
-
-
-
+  <h1 class="text-block" align="center">Simulated Loops ProcessBook</h1><br>
+    <img src="combination.gif" width="800"><br>
+     
     <div class="paragraph-oneColumn">
     <h2><div align="center">Overview</h2>
     <div> 
-    My interest in the technology field lies in amplifying human sensations through the combination of digital and physical experiences. Currently, my main interest is in how to enhance the relaxation experience during leisure time. To be honest, I do not have a clear favorite tool; I still hope to try various possibilities that can achieve my goals. Therefore, I have tried combining Arduino with Touch Designer, integrating Touch Designer with physical objects, and creating pure animations with Blender.
+    In this project, I attempted to use TouchDesigner to visualize the flow of air and project it onto a real-world ventilation outlet. The final outcome consists of four parts: the central mesh acts as the main body matching the shape of the vent, particles serve as disordered floating objects, fluctuating waves represent the horizontal airflow, and the dense waves at the top signify the vertical airflow.
 
+</div></div><br>
+    
+    
+    <h2><div align="center">Part1-Bouncy Mesh & Particles</h2>
+      <img src="donut.gif" width="800">
+      <div class="paragraph-oneColumn">
+    This part was refined based on a class exercise. For the main body of the “donut” shape, we applied a mesh material, and make its size scaled reacting to the music. To achieve the visual representation of airflow, we harnessed the Particle SOP to generate a base particle system, simulating the chaotic drift of particulate matter.
+
+</div></div><br>
+
+    <h2><div align="center">Part2-Waves</h2>
+      <img src="wave.gif" width="800">
+      <div class="paragraph-oneColumn">
+    In this step, the approach I've taken involves employing feedback loops and noise functions to craft a compelling simulation of waves, capturing their natural rhythm and movement. Simultaneously, I apply a spectrum of color gradients and tactile textures, which inject depth and dimension into the otherwise flat waves. Furthermore, by introducing a subtle blur effect to the visual output, the waves gain a softer, more authentic quality that brings the animation closer to the fluid motion of air. 
+
+</div></div><br>
+
+    <h2><div align="center">Part3-Vibrating lines(Top Part)</h2>
+      <img src="bouncyline.png" width="800">
+      <div class="paragraph-oneColumn">
+    For this part, I mainly used Circle TOPs and a Copy TOP to take the transformed circle and replicate it multiple times, creating a series of circles that formed the bouncing line. Then, I created the particle-based animation.
+
+    </div></div><br>
+
+    <h2><div align="center">Assembly and Results</h2>
+      <img src="kantanMapper.png" width="800">
+      <div class="paragraph-oneColumn">
+    Finally, by adding the KantanMapper from the left column and drawing the shape to be projected within it. Drag the three parts into the segment, piece them together, and project them onto the aligned position of the vent.
+
+<br> 
 </div></div>
-    
-
-
-     <h2><div align="center">Combining the vibrant stone with real objects</h2>
-      <img src="sofa.gif" width="400" height="400">
-      <img src="cup.gif" width="400" height="400">
-   </div>
-   <div class="paragraph">
-    <h2>Step 2 – Fetch Color From Image</h2>
-    <div>  Next, as shown in my first diagram, I want to extract a color from the image and generate a palette extended from this color through the Colormind API. Unfortunately, I just realized that the API I wanted to use, Colormind, supports neither HTTPS nor CORS, leading to a persistent issue of Cross-Origin Request Blocked.
-    
-    <br><br><br><br>
-    Step 2 Update: In class, we learned how to set up a local server to avoid issues caused by CORS, but I still encountered problems when I tried it myself. So, I asked for a solution during the class, and it turns out that the reason is Colormind uses the traditional method of XMLHttpRequest to make the API call, instead of the modern fetch API we learned.
-
-</div>
-
-</div>
-</div>
-     <div class="text-block links" >First Successful Attempt:
-    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/GetColorFromImg/index.html" class="links">Fetch Color From Image</a>
-     </div>
-
- <div class="two-columns-grid">
-    <div class="paragraph">
-    <h2>Step 3 – Fetch Album by the Image Mood</h2>
-    <div> Next, I tried to generate corresponding Album Covers by passing the mood of the picture to The AudioDB API. However, the problem with this attempt is that Pixabay does not have a direct display function for mood, and although The AudioDB marks the mood of each piece of music, it does not allow searching by mood. Therefore, I decided to obtain the tags of pictures from Pixabay and map them to moods, and then proceed to match these moods with various artists for transmission.
-
-</div></div>
-    <div align="left"> 
-    	<pre>
-          <code>
-         const moodMapping = {
-           beach: "Relaxed",
-           sunset: "Romantic",
-           puppy: "Joyful",
-           city: "Energetic",
-           nature: "Peaceful",
-           flower: "Happy",
-           snow: "Calm",
-           mountain: "Inspiring",
-           rain: "Melancholic",
-           night: "Mysterious",
-           party: "Upbeat",
-           forest: "Serene",
-           desert: "Lonely",
-           ocean: "Infinite",
-           adventure: "Excited"
-         };
-
-        const moodToArtistMapping = {
-          Relaxed: "Jack Johnson",
-          Romantic: "Ed Sheeran",
-          Joyful: "coldplay",
-          Energetic: "Calvin Harris",
-          Peaceful: "Norah Jones",
-          Happy: "Katy Perry",
-          Calm: "Adele",
-          Inspiring: "Hans Zimmer",
-          Melancholic: "Billie Eilish",
-          Mysterious: "Massive Attack",
-          Upbeat: "Bruno Mars",
-          Serene: "Enya",
-          Lonely: "Bon Iver",
-          Infinite: "Sigur Rós",
-          Excited: "Imagine Dragons"
-         };
-      </code>
-       </pre>
-        
-   <pre>
-      <code>
-       function findMusicByMood(tags) {
-
-        const artistName = tags.map(tag => moodMapping[tag])
-            .find(mood => moodToArtistMapping[mood] !== undefined);
-
-        if (artistName) {
-            const artist = moodToArtistMapping[artistName];
-            fetchArtistDiscography(artist);
-
-        } else {
-            document.getElementById('musicData').innerHTML =
-             'No matching artist found for the image tags.';
-        }
-    }
-      </code>
-    </pre>
-   </div>
-   </div>
-
-  <div class="text-block links" >Second Attempt:
-    <a href="https://jinyuyuuyuuu.github.io/Creative-Tech3/GetAlbumFromImage/index.html" class="links">Fetch Album by the Image Mood</a>
-     </div>
-
-   <div class="two-columns-grid">
-    <div align="left"> 
-    	<pre>
-          <code>
-      function fetchColorPalette(yearReleased) {
-
-        let lastDigit = yearReleased.toString().slice(-1);
-        let rValue = parseInt(lastDigit) * 28; 
-        let data = {
-            model: "default",
-            input: [[rValue, 43, 44], [90, 83, 82], "N", "N", "N"]
-        };
-
-        fetch("http://colormind.io/api/", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result) {
-               document.body.style.backgroundColor = 
-               `rgb(${data.result[0].join(',')})`;
-                displayColorPalette(data.result);
-            }
-        })
-        .catch(error => console.error('Error fetching color palette:', error));
-    }
-
-    function displayColorPalette(palette) {
-        const paletteContainer = document.getElementById('colorPalette');
-        paletteContainer.innerHTML = palette.map(color =>
-    }
-     </code>
-       </pre>
-   </div>
-   <div class="paragraph">
-    <h2>Step 4 – Fetch Color From Album</h2>
-    <div>  My wish was to pass the information obtained from the Album to the Colormind API and get a color palette. Unfortunately, even after using my own server and the method improved in class, this CORS issue still kept reoccurring. After many attempts, due to my unfamiliarity with the traditional method of XMLHttpRequest to make the API call, I had to give up and start looking for other available APIs.
-    
-    <br><br>
-    <img src="CORSissue.png"></div>
-
-</div>
-
-</div>
-</div>
-
-<div class="two-columns-grid">
-    <div class="paragraph">
-    <h2>Step 5 – Fetch Object From Album</h2>
-    <div> After a series of attempts, I decided to obtain information about the collections received by The Met Museum in the same year as the latest Album year obtained. To avoid too much content, I chose to display only 3 items and limited the displayed information to include Object Name, Artist, Date, and Medium.
-
-</div></div>
-    <div align="left"> 
-    	<pre>
-          <code>
-       function fetchArtistDiscography(artistName) {
-        const url = `https://www.theaudiodb.com/api/v1/json/2/discography.php?s=
-        ${encodeURIComponent(artistName)}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.album) {
-                    displayDiscography(data.album, artistName);
-                } else {
-                    noAlbumFound(artistName);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching discography:", error);
-            });
-    }
-
-      function displayDiscography(albums, artistName) {
-        const musicDataSection = document.getElementById('musicData');
-        let content = `Discography of ${artistName}`;
-        let lastAlbumYear = null; 
-    albums.forEach(album => {
-        content += `${album.strAlbum} - ${album.intYearReleased}`;
-        lastAlbumYear = album.intYearReleased; 
-    content += `</ul>`;
-    musicDataSection.innerHTML = content;
-    
-    if (lastAlbumYear) {
-        fetchMetMuseumObjectsByYear(lastAlbumYear); 
-        // Fetch Met Museum objects for the year of the last album
-     }
-    }
-
-    function fetchMetMuseumObjectsByYear(year) {
-        const url = `https://collectionapi.metmuseum.org/
-        public/collection/
-        v1/objects?dateBegin=${year}&dateEnd=${year}`;
-        fetch(url)
-
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.total > 0) {
-                    displayMetObjects(data.objectIDs, year);
-                } else {
-                    console.log("No objects found for the year " + year);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching Met Museum objects:", error);
-            });
-    }
-
-      function displayMetObjects(objectIDs, year) {
-        const objectsSection = document.getElementById('musicData'); 
-        objectsSection.innerHTML += `Met Museum Objects from ${year}`;
-        objectIDs.slice(0, 3).forEach(objectID => 
-        { // Limit to first 3 objects for simplicity
-            fetchObjectDetails(objectID); 
-        });
-    }
-
-    function fetchObjectDetails(objectID) {
-        const url = `https://collectionapi.metmuseum.org/
-        public/collection/v1/objects/${objectID}`;
-
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                displayObjectDetails(data);
-            })
-            .catch(error => {
-                console.error("Error fetching object details:", error);
-            });
-    }
-
-    function displayObjectDetails(object) {
-        const objectsSection = 
-        document.getElementById('musicData'); 
-        let content = `${object.title}
-            Artist: ${object.artistDisplayName}
-            Date: ${object.objectDate}
-            medium: ${object.medium}`;
-        objectsSection.innerHTML += content;
-    }
-      </code>
-       </pre>
-   </div>
-</div>
-
-    
+<br> 
+    <img src="present.gif" width="800">
 <br><br><br><br>
 
 </html>

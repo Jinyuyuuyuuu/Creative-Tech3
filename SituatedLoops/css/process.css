@@ -2,6 +2,7 @@ body{
 	margin-top: 60px;
 	margin:auto;
     text-align: center;
+    align-items: center;
 
 /*	background:#000000;*/
 }
@@ -19,7 +20,7 @@ h1{
 h2{
     text-align: left;
     font-family: 'Poppins', sans-serif;
-    color: #0F8D07;
+    color: #866697;
 }
 
 .links{
@@ -32,8 +33,7 @@ h2{
 }
 
 img {  
-     max-width: 90%;
-     height: auto;
+     align-items: center;
 }  
 .two-columns-grid{
 /*  margin-top: 100px;
