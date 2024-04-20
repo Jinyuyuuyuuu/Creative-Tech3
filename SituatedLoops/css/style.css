@@ -1,0 +1,67 @@
+body{
+	margin-top: 60px;
+	margin:auto;
+  text-align: left;
+  padding: 50px;
+
+/*	background:#000000;*/
+}
+h1{
+  padding: 50px;
+	  text-align: left;
+		font-family: 'Poppins', sans-serif;
+}
+h2{
+    
+    font-family: 'Poppins', sans-serif;
+    text-align: left;
+}
+
+h3{
+    font-family: 'Poppins', sans-serif;
+    text-align: left;
+}
+
+img {  
+ margin-top: 20px;
+ max-width: 100%;
+ height: auto;
+ display: block;
+
+}  
+.musicData{
+  margin-top: 20px;
+}
+.two-columns-grid{
+/*  margin-top: 100px;
+  margin-bottom: 100px;*/
+  padding: 100px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+/*.column {
+  float: left;
+  width: 50%;
+  padding:30px;
+}
+*/
+.paragraph
+{
+  margin-top: 30px;
+  margin-left: 60px;
+  margin-right: 60px;
+  text-align: left;
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  line-height: 180%;
+}
+
+pre code {
+  margin: auto;
+  background-color: #eee;
+  border: 1px solid #999;
+  display: block;
+  padding: 20px;
+/*  text-align: left;*/
+  max-width: 50%;
+}
